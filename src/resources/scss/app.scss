@@ -1,0 +1,9 @@
+@import '_variable.scss';
+
+h1 {
+    color: var($red-color);
+}
+
+h2 {
+    color: green;
+}
