@@ -1,19 +1,26 @@
 const jwt = require("jsonwebtoken");
-const Admin = require("../models/Admin");
+const Admin = require("../models/User");
 
 const validateAdmin = async (req, res, next) => {
   const accessToken = req.headers.access_token;
+  if (!accessToken) {
+    return res
+      .status(400)
+      .json({ errorState: 400, errorMessage: "AccessToken wrong!" });
+  }
   try {
-    const payload = jwt.verify(accessToken, process.env.SECRET_KEY);
-    if (payload.email) {
+    const payload = await jwt.verify(accessToken, process.env.SECRET_KEY);
+
+    if (payload.email || payload === undefined) {
       const admin = await Admin.findOne({ email: payload.email });
       if (!admin.isAdmin) {
-        return res.status(403).json({message : "You are not authorized!"});
+        return res.status(403).json({ message: "You are not authorized!" });
       }
+      truen;
     }
     return next();
   } catch (e) {
-    return res.status(403).json("You are not authorized!");
+    return res.status(500).json("Internal Server Error!");
   }
 };
 

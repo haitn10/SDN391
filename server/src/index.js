@@ -5,8 +5,8 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
 const nationsRouter = require("./routes/nations");
-const adminRouter = require("./routes/admins");
 const playerRouter = require("./routes/players");
+const userRouter = require("./routes/users");
 const { login } = require("./controllers/auth/login");
 
 const app = express();
@@ -36,7 +36,7 @@ app.use(express.json());
 
 //router
 app.use("/login", login);
-app.use("/admins", adminRouter);
+app.use("/users", userRouter);
 app.use("/players", playerRouter);
 app.use("/nations", nationsRouter);
 

@@ -13,25 +13,23 @@ const getPlayers = async (req, res, next) => {
 };
 
 const getPlayer = async (req, res, next) => {
-  const playerId = req.params._id;
+  const playerId = req.params.Id;
   try {
-    const player = await Player.findOne({ _id: playerId });
-    return res.status(200).json(player);
+    const playerInfo = await Player.findOne({ _id: playerId });
+    if (!playerInfo)
+      return res
+        .status(404)
+        .json({ errorStatus: 404, errorMessage: "Not Found Player!" });
+    return res.status(200).json(playerInfo);
   } catch (e) {
-    return res.status(503).json("Service Unavailable!");
+    res.status(500).json({ status: 500, message: "Internal Server Error!" });
+    next(e);
   }
 };
 
 const addPlayers = async (req, res, next) => {
   const newPlayers = new Player(req.body);
   try {
-    const player = await Player.find();
-    player.forEach((items) => {});
-    if (userFound) {
-      done(null, user);
-    } else {
-      done(null, false, { message: "user not found" });
-    }
     newPlayers.save();
     return res.status(200).json(newPlayers);
   } catch (e) {
@@ -40,22 +38,31 @@ const addPlayers = async (req, res, next) => {
 };
 
 const editPlayers = async (req, res, next) => {
-  const newInfos = new Player(req.body);
+  const playerId = req.params.Id;
   try {
-    const player = await Player.findByIdAndUpdate(newInfos);
-    res.status(200).json(player);
+    const player = await Player.findOneAndUpdate({ _id: playerId }, req.body);
+    return res
+      .status(200)
+      .json({ status: 200, message: "Update Successfully!" });
   } catch (e) {
-    res.status(501).json("Not Implemented");
+    next(e);
+    return res
+      .status(501)
+      .json({ errorStatus: 500, errorMessage: "Internal Server Error!" });
   }
 };
 
-const deleteNations = async (req, res, next) => {
-  const playerId = req.body._id;
+const deletePlayers = async (req, res, next) => {
+  const playerId = req.params.Id;
+  console.log(playerId);
   try {
-    await Player.findByIdAndRemove(playerId);
+    await Player.findOneAndDelete({ _id: playerId });
     return res.status(200).json({ message: "Deleted Successfully" });
   } catch (e) {
-    return res.status(501).json("Not Implemented");
+    next(e);
+    return res
+      .status(501)
+      .json({ errorStatus: 500, errorMessage: "Internal Server Error!" });
   }
 };
 
@@ -64,5 +71,5 @@ module.exports = {
   getPlayer,
   addPlayers,
   editPlayers,
-  deleteNations,
+  deletePlayers,
 };

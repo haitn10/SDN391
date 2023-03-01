@@ -11,8 +11,8 @@ const PlayerSchema = mongoose.Schema(
       type: String,
       require: true,
     },
-    birth: {
-      type: String,
+    yoB: {
+      type: Number,
       require: true,
     },
     club: {
@@ -32,8 +32,9 @@ const PlayerSchema = mongoose.Schema(
       require: true,
     },
     nation: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "nation",
+      // type: mongoose.Schema.Types.ObjectId,
+      type:String,
+      // ref: "nation",
       require: true,
     }
   }

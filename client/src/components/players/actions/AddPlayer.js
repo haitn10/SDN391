@@ -1,38 +1,41 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Navbar from "../../common/Navbar";
+import { StoreContext } from "../../../store";
+import { useNavigate } from "react-router-dom";
 import { addPlayer } from "../../../api";
 
-let positions = [
+export const positions = [
   { id: "1", position: "Goalkeeper" },
   { id: "2", position: "Defender" },
   { id: "3", position: "Midfielder " },
   { id: "4", position: "Forward" },
 ];
 
-function Add() {
-  const [name, setName] = useState("");
-  const [birth, setBirth] = useState("");
-  const [club, setClub] = useState("");
-  const [image, setImage] = useState("");
-  const [position, setPosition] = useState("");
-  const [jerseyNumber, setjerseyNumber] = useState(0);
-  const [goals, setGoals] = useState(0);
-  const [nation, setNation] = useState("");
-  const [success, setSucess] = useState(false);
+function AddPlayer() {
+  const navigate = useNavigate();
+  const [state, dispatch] = useContext(StoreContext);
+  const [values, setValues] = useState({
+    name: "",
+    image: "",
+    yoB: "",
+    position: "",
+    club: "",
+    nation: "",
+    jerseyNumber: "",
+    goals: "",
+  });
 
-  const onAdd = async (e) => {
-    e.preventDefault();
-    const result = await addPlayer({
-      name,
-      birth,
-      club,
-      image,
-      position,
-      jerseyNumber,
-      goals,
-      nation
+  const handleChange = (e) => {
+    setValues({
+      ...values,
+      [e.target.name]: e.target.value,
     });
-    setSucess(JSON.parse(result));
+  };
+
+  const handleAdd = async (token) => {
+    const result = await dispatch(addPlayer({ values, token }));
+    console.log(result);
+    navigate(`/players`);
   };
 
   return (
@@ -48,7 +51,7 @@ function Add() {
               </p>
               <hr className="my-4" />
               <div className="row text-start">
-                <form className="needs-validation">
+                <form>
                   <div className="row g-3">
                     <div className="col-sm-6">
                       <label htmlFor="playerName" className="form-label">
@@ -59,8 +62,8 @@ function Add() {
                         className="form-control"
                         id="playerName"
                         name="name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        value={values.name}
+                        onChange={handleChange}
                         required
                       />
                     </div>
@@ -76,24 +79,25 @@ function Add() {
                         name="jerseyNumber"
                         min="1"
                         max="1000"
-                        value={jerseyNumber}
-                        onChange={(e) => setjerseyNumber(e.target.value)}
+                        value={values.jerseyNumber}
+                        onChange={handleChange}
                         required
                       />
                     </div>
 
                     <div className="col-sm-6">
                       <label htmlFor="birth" className="form-label">
-                        Birth of Player
+                        Year Of Birth
                       </label>
                       <input
-                        type="date"
+                        type="number"
                         className="form-control"
                         id="birth"
-                        name="birth"
-                        max={new Date().toISOString().split("T")[0]}
-                        value={birth}
-                        onChange={(e) => setBirth(e.target.value)}
+                        name="yoB"
+                        min={1970}
+                        max={2015}
+                        value={values.yoB}
+                        onChange={handleChange}
                         required
                       />
                     </div>
@@ -108,8 +112,8 @@ function Add() {
                         id="club"
                         name="club"
                         placeholder="e.g Real Marid"
-                        value={club}
-                        onChange={(e) => setClub(e.target.value)}
+                        value={values.club}
+                        onChange={handleChange}
                         required
                       />
                     </div>
@@ -123,10 +127,9 @@ function Add() {
                         className="form-control"
                         id="image"
                         name="image"
-                        value={image}
+                        value={values.image}
                         accept="image/*"
-                        onChange={(e) => setImage(e.target.value)}
-                        required
+                        onChange={handleChange}
                       />
                     </div>
 
@@ -138,11 +141,11 @@ function Add() {
                         className="form-select"
                         id="position"
                         name="position"
-                        value={position}
-                        onChange={(e) => setPosition(e.target.value)}
+                        value={values.position}
+                        onChange={handleChange}
                         required
                       >
-                        <option unselectable="true" disabled>
+                        <option unselectable="false" disabled>
                           Choose position
                         </option>
                         {positions.map((pos) => (
@@ -162,8 +165,8 @@ function Add() {
                         className="form-control"
                         id="nation"
                         name="nation"
-                        value={nation}
-                        onChange={(e) => setNation(e.target.value)}
+                        value={values.nation}
+                        onChange={handleChange}
                         required
                       />
                     </div>
@@ -179,8 +182,8 @@ function Add() {
                         name="goals"
                         min="0"
                         max="1000"
-                        value={goals}
-                        onChange={(e) => setGoals(e.target.value)}
+                        value={values.goals}
+                        onChange={handleChange}
                         required
                       />
                     </div>
@@ -191,7 +194,7 @@ function Add() {
                   <button
                     className="w-100 btn btn-success btn-lg"
                     type="submit"
-                    onClick={onAdd}
+                    onClick={() => handleAdd(state.accessToken)}
                   >
                     Add Player
                   </button>
@@ -205,4 +208,4 @@ function Add() {
   );
 }
 
-export default Add;
+export default AddPlayer;

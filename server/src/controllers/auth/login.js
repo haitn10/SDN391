@@ -1,46 +1,35 @@
-const jwt = require('jsonwebtoken');
-const Admin = require("../../models/Admin");
+const jwt = require("jsonwebtoken");
 const { checkPassword } = require("../../utils/passwordService");
+const User = require("../../models/User");
 
 const login = async (req, res, next) => {
   try {
-    const admin = await Admin.findOne({
-      email: req.body.email,
+    const user = await User.findOne({
+      username: req.body.username,
     });
-    
 
-    if (!admin) return res.status(404).json("User not found!");
-    if (!admin.isAdmin)
-      return res
-        .status(401)
-        .json(
-          "Your account has been disabled! Please contact Administrator for more info."
-        );
-    if (!(await checkPassword(req.body.password, admin.password))) {
+    if (!user) return res.status(404).json("User not found!");
+    if (!(await checkPassword(req.body.password, user.password))) {
       return res.status(400).json("Password is incorrect");
     }
     const payload = {
-      email: admin.email,
-      name: admin.name,
-      id: admin.id,
-      isAdmin: true,
+      username: user.username,
+      name: user.name,
+      id: user.id,
+      yoB: user.yoB,
+      isAdmin: user.isAdmin,
     };
     const accessToken = jwt.sign(payload, process.env.SECRET_KEY, {
       expiresIn: "30m",
     });
-    const refreshToken = jwt.sign(
-      { ...payload, refreshToken: true },
-      process.env.SECRET_KEY,
-      {
-        expiresIn: "1d",
-      }
-    );
-    return res.status(200).json({
-      ...payload,
-      accessToken,
-      refreshToken,
-    });
+
+    return res
+      .status(200)
+      .json({ profile: { ...payload }, accessToken: accessToken });
   } catch (e) {
+    res
+      .status(500)
+      .json({ errorStatus: 500, errorMessage: "Internal Server Error!" });
     return next(e);
   }
 };

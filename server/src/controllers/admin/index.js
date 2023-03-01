@@ -1,28 +1,20 @@
-const Admin = require("../../models/Admin");
+const User = require("../../models/User");
 const { hashPassword } = require("../../utils/passwordService");
 
-const addAdmin = async (req, res, next) => {
+const removeAdmin = async (req, res, next) => {
+  const userId = req.body._id;
   try {
-    const checkAdmin = await Admin.findOne({
-      email: req.body.email,
-    });
-    if (checkAdmin) {
+    const userInfo = await User.findByIdAndUpdate(userId, { isAdmin: false });
+    if (!userInfo)
       return res
         .status(400)
-        .json({ errorStatus: 400, errorMessage: "Admin has ready existed!" });
-    } else {
-      const password = hashPassword(req.body.password);
-      const newAdmin = new Admin({
-        email: req.body.email,
-        password: password,
-        name: req.body.name,
-        isAdmin: req.body.isAdmin,
-      });
-      await newAdmin.save();
-      res.status(200).json("Register success admin!");
-    }
+        .json({ errorStatus: 400, errorMessage: "Cannot update User!" });
+    res.status(200).json({ state: 200, message: "Update successfully!" });
   } catch (e) {
+    res
+      .status(500)
+      .json({ errorStatus: 500, errorMessage: "Internal Server Error! " });
     next(e);
   }
 };
-module.exports = { addAdmin };
+module.exports = { removeAdmin };
