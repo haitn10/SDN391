@@ -27,6 +27,8 @@ const login = async (req, res, next) => {
     });
 
     return res.status(200).json({
+      status: 200,
+      message: "Login successfully!",
       profile: { ...payload },
       accessToken: accessToken,
     });

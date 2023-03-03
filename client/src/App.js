@@ -44,7 +44,7 @@ function App() {
             <Route path="/players" element={<Players />} />
             <Route path="/users" element={<Users />} />
             <Route path="/players/add" element={<AddPlayer />} exact/>
-            <Route path="/accounts" element={<Accounts />} />
+            <Route path="/accounts" element={<Accounts id={state.profile.id} />} />
             {state.players.map((item, index) => (
               <Route
                 key={index}

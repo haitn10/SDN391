@@ -1,10 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
-import { StoreContext, actions } from "../../store";
+import { StoreContext } from "../../store";
 import { Link, useNavigate } from "react-router-dom";
 import { register } from "../../api";
+import { message } from "antd";
 
 function Register() {
   const [state, dispatch] = useContext(StoreContext);
+  const [messageApi, contextHolder] = message.useMessage();
   const navigate = useNavigate();
   const [values, setValues] = useState({
     username: "",
@@ -12,7 +14,16 @@ function Register() {
     name: "",
     yoB: "",
   });
-  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    // setMessage(state.data);
+    if (state.accessToken) {
+      navigate("/");
+    } else {
+      setValues({ username: "", password: "", name: "", yoB: "" });
+      navigate("/register");
+    }
+  }, [state, navigate]);
 
   const handleChange = (e) => {
     setValues({
@@ -24,36 +35,25 @@ function Register() {
   const onRegister = async (e) => {
     e.preventDefault();
     const result = await register({ values });
+    console.log(result);
     if (result.status === 200) {
-      setMessage(result.message);
-      navigate("/login");
+      await info("success", result.message);
+      setTimeout(() => navigate("/login"), 1000);
     } else {
-      setMessage(result.message);
+      info("error", result.message);
     }
   };
 
-  useEffect(() => {
-    // setMessage(state.data);
-    if (state.accessToken) {
-      navigate("/");
-    } else {
-      setValues({ username: "", password: "", name: "", yoB: "" });
-      navigate("/register");
-    }
-  }, [state, navigate]);
+  const info = (status, msg) => {
+    messageApi.open({
+      type: status,
+      content: msg,
+    });
+  };
+
   return (
     <>
-      <div className="position-fixed bottom-0 end-0 p-3" style={{ zIndex: 11 }}>
-        <div
-          id="liveToast"
-          className="toast hide"
-          role="alert"
-          aria-live="assertive"
-          aria-atomic="true"
-        >
-          <div className="toast-body">{message}</div>
-        </div>
-      </div>
+      {contextHolder}
       <div
         style={{
           backgroundImage:
@@ -127,7 +127,7 @@ function Register() {
                   className="form-control"
                   id="imputyoB"
                   name="yoB"
-                  min={1900}
+                  min={1970}
                   max={2015}
                   placeholder="Type your year of birth"
                   value={values.yoB}

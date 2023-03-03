@@ -6,23 +6,21 @@ export const login = async (req, res, next) => {
   try {
     const { data: result } = await axios.post(`${baseURL}/login`, req);
     sessionStorage.setItem("data", JSON.stringify(result));
-    return Promise.resolve(JSON.stringify(result));
+    return Promise.resolve(result);
   } catch (e) {
-    return Promise.reject(e);
+    return e.response.data;
   }
 };
 
 export const register = async (req, res, next) => {
   try {
-    const { data: result } = await axios.post(
+    const {data: result} = await axios.post(
       `${baseURL}/users/register`,
       req.values
     );
-    sessionStorage.setItem("data", JSON.stringify(result.data));
-    console.log(result.data);
-    return result.data;
+    return result;
   } catch (e) {
-    return Promise.reject(e);
+    return e.response.data;
   }
 };
 
@@ -73,7 +71,7 @@ export const editPlayer = async (req, res) => {
         },
       }
     );
-    return Promise.resolve(result);
+    return result;
   } catch (e) {
     return Promise.reject(e);
   }

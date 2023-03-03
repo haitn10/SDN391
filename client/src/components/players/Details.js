@@ -40,7 +40,8 @@ function Details({ id, disabled }) {
   };
 
   const handleSubmit = async (token, id) => {
-    const result = await dispatch(editPlayer({ values, id, token }));
+    const result = await editPlayer({ values, id, token });
+    console.log(result);
     if (result.status === 200) {
       info("success", result.message);
     } else {

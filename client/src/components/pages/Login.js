@@ -2,29 +2,16 @@ import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../../api";
 import { StoreContext, actions } from "../../store";
+import { message } from "antd";
 
 function Login() {
   const [state, dispatch] = useContext(StoreContext);
+  const [messageApi, contextHolder] = message.useMessage();
   const navigate = useNavigate();
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-
-  const onLogin = async (e) => {
-    e.preventDefault();
-    if (username.length === 0 || password.length === 0) {
-      return;
-    }
-    try {
-      const result = await login({ username, password });
-      dispatch(actions.setState(JSON.parse(result)));
-    } catch (e) {
-      dispatch(actions.setState(e.response));
-    }
-  };
 
   useEffect(() => {
-    setErrorMessage(state.data);
     if (state.accessToken) {
       navigate("/");
     } else {
@@ -34,8 +21,28 @@ function Login() {
     }
   }, [state, navigate]);
 
+  const onLogin = async (e) => {
+    e.preventDefault();
+    if (username.length === 0 || password.length === 0) {
+      return;
+    }
+    const result = await login({ username, password });
+    if (result.status === 200) {
+      dispatch(actions.setState(result));
+    } else {
+      info("error", result.message);
+    }
+  };
+
+  const info = (status, msg) => {
+    messageApi.open({
+      type: status,
+      content: msg,
+    });
+  };
   return (
     <>
+      {contextHolder}
       <div
         style={{
           backgroundImage:
@@ -81,9 +88,6 @@ function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
-              </div>
-              <div className="my-3 text-danger fw-bold">
-                <span>{errorMessage}</span>
               </div>
               <div className="d-flex justify-content-center">
                 <button
