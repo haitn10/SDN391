@@ -1,4 +1,9 @@
-import { LOG_OUT, SET_DATA, SET_PLAYER, SET_USER } from "./Constants";
+import {
+  LOG_OUT,
+  SET_DATA,
+  SET_NATION,
+  SET_PLAYER,
+} from "./Constants";
 
 export const setState = (state) => ({
   type: SET_DATA,
@@ -14,7 +19,7 @@ export const setPlayer = (state) => ({
   state,
 });
 
-export const setUser = (state) => ({
-  type: SET_USER,
+export const setNation = (state) => ({
+  type: SET_NATION,
   state,
-})
+});

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { login } from "../../api";
 import { StoreContext, actions } from "../../store";
 
@@ -93,6 +93,10 @@ function Login() {
                 >
                   Submit
                 </button>
+              </div>
+              <div className="justify-content-center d-flex mt-4">
+                <span>Don't have account?</span>
+                <Link to="/register">Sign up</Link>
               </div>
             </form>
           </div>

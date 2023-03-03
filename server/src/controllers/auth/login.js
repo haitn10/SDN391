@@ -8,9 +8,12 @@ const login = async (req, res, next) => {
       username: req.body.username,
     });
 
-    if (!user) return res.status(404).json("User not found!");
+    if (!user)
+      return res.status(404).json({ status: 400, message: "User not found!" });
     if (!(await checkPassword(req.body.password, user.password))) {
-      return res.status(400).json("Password is incorrect");
+      return res
+        .status(400)
+        .json({ status: 400, message: "Password is incorrect!" });
     }
     const payload = {
       username: user.username,
@@ -23,9 +26,10 @@ const login = async (req, res, next) => {
       expiresIn: "30m",
     });
 
-    return res
-      .status(200)
-      .json({ profile: { ...payload }, accessToken: accessToken });
+    return res.status(200).json({
+      profile: { ...payload },
+      accessToken: accessToken,
+    });
   } catch (e) {
     res
       .status(500)

@@ -12,15 +12,14 @@ const nationRouter = express.Router();
 
 //GET
 nationRouter.get("/", getNations);
-nationRouter.get("/:countryId", getNation);
 
 //POST
 nationRouter.post("/add", validateAdmin, addNations);
 
 //PUT
-nationRouter.put("/:nationid", validateAdmin, editNations);
+nationRouter.put("/:Id", validateAdmin, editNations);
 
 //DELETE
-nationRouter.delete("/:nationid", validateAdmin, deleteNations);
+nationRouter.delete("/:Id", validateAdmin, deleteNations);
 
 module.exports = nationRouter;

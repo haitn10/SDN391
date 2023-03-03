@@ -9,7 +9,6 @@ function Players() {
   const [state, dispatch] = useContext(StoreContext);
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-
   useEffect(() => {
     async function fetchMyAPI() {
       const response = await getPlayers();
@@ -17,7 +16,7 @@ function Players() {
       sessionStorage.setItem("players", JSON.stringify(response));
     }
     fetchMyAPI();
-  });
+  }, []);
 
   const handleDelete = async (id, token) => {
     const confirm = window.confirm("Are you sure you want to delete ?");
@@ -89,7 +88,7 @@ function Players() {
           </div>
         </div>
         <div className="row">
-          {state.player.map((data, index) => (
+          {state.players.map((data, index) => (
             <div key={index} className="col-lg-3 col-md-6 col-sm-12 border-0">
               <div key={index} className="profile-card text-center">
                 {data.image ? (
@@ -101,39 +100,32 @@ function Players() {
                     alt=""
                   />
                 )}
-                <div className="profile-actions">
-                  <button
-                    className="btn btn-secondary mb-2"
-                    onClick={(e) => handleNavigate(data._id)}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-pen-fill"
-                      viewBox="0 0 16 16"
+                {state.profile.isAdmin ? (
+                  <div className="profile-actions">
+                    <button
+                      className="btn btn-secondary mb-2"
+                      onClick={(e) => handleNavigate(data._id)}
                     >
-                      <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z" />
-                    </svg>
-                  </button>
-                  <button
-                    className="btn btn-danger"
-                    type="button"
-                    onClick={(e) => handleDelete(data._id, state.accessToken)}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-trash3-fill"
-                      viewBox="0 0 16 16"
+                      <i class="bi bi-pen-fill"></i>
+                    </button>
+                    <button
+                      className="btn btn-danger"
+                      type="button"
+                      onClick={(e) => handleDelete(data._id, state.accessToken)}
                     >
-                      <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z" />
-                    </svg>
-                  </button>
-                </div>
+                      <i class="bi bi-trash3-fill"></i>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="profile-actions">
+                    <button
+                      className="btn btn-secondary mb-2"
+                      onClick={(e) => handleNavigate(data._id)}
+                    >
+                      <i class="bi bi-eye"></i>
+                    </button>
+                  </div>
+                )}
                 <div className="profile-name">{data.name}</div>
                 <div className="profile-overview">
                   <div className="profile-overview">

@@ -1,8 +1,8 @@
-import React, { useContext, useState } from "react";
-import Navbar from "../../common/Navbar";
-import { StoreContext } from "../../../store";
+import React, { useContext, useEffect, useState } from "react";
+import Navbar from "../common/Navbar";
+import { StoreContext } from "../../store";
 import { useNavigate } from "react-router-dom";
-import { addPlayer } from "../../../api";
+import { addPlayer, getNations } from "../../api";
 
 export const positions = [
   { id: "1", position: "Goalkeeper" },
@@ -24,6 +24,15 @@ function AddPlayer() {
     jerseyNumber: "",
     goals: "",
   });
+  const [nationsList, setNationsList] = useState([]);
+
+  useEffect(() => {
+    async function fetchMyAPI() {
+      const list = await getNations();
+      setNationsList(list);
+    }
+    fetchMyAPI();
+  }, []);
 
   const handleChange = (e) => {
     setValues({
@@ -32,11 +41,13 @@ function AddPlayer() {
     });
   };
 
-  const handleAdd = async (token) => {
+  const handleAdd = async (e, token) => {
+    e.preventDefault();
     const result = await dispatch(addPlayer({ values, token }));
     console.log(result);
     navigate(`/players`);
   };
+
 
   return (
     <>
@@ -51,7 +62,7 @@ function AddPlayer() {
               </p>
               <hr className="my-4" />
               <div className="row text-start">
-                <form>
+                <form onSubmit={(e) => handleAdd(e, state.accessToken)}>
                   <div className="row g-3">
                     <div className="col-sm-6">
                       <label htmlFor="playerName" className="form-label">
@@ -62,6 +73,7 @@ function AddPlayer() {
                         className="form-control"
                         id="playerName"
                         name="name"
+                        placeholder="e.g Ronaldo"
                         value={values.name}
                         onChange={handleChange}
                         required
@@ -79,6 +91,7 @@ function AddPlayer() {
                         name="jerseyNumber"
                         min="1"
                         max="1000"
+                        placeholder="e.g 7"
                         value={values.jerseyNumber}
                         onChange={handleChange}
                         required
@@ -94,6 +107,7 @@ function AddPlayer() {
                         className="form-control"
                         id="birth"
                         name="yoB"
+                        placeholder="e.g 1970"
                         min={1970}
                         max={2015}
                         value={values.yoB}
@@ -123,12 +137,13 @@ function AddPlayer() {
                         Image
                       </label>
                       <input
-                        type="file"
+                        type="text"
                         className="form-control"
                         id="image"
                         name="image"
                         value={values.image}
-                        accept="image/*"
+                        // accept="image/*"
+                        placeholder="Enter image URL "
                         onChange={handleChange}
                       />
                     </div>
@@ -145,9 +160,6 @@ function AddPlayer() {
                         onChange={handleChange}
                         required
                       >
-                        <option unselectable="false" disabled>
-                          Choose position
-                        </option>
                         {positions.map((pos) => (
                           <option key={pos.id} value={pos.position}>
                             {pos.position}
@@ -157,18 +169,23 @@ function AddPlayer() {
                     </div>
 
                     <div className="col-md-4">
-                      <label htmlFor="nation" className="form-label">
-                        Nation
-                      </label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="nation"
+                      <label className="form-label">Nation</label>
+                      <select
+                        className="form-select"
                         name="nation"
                         value={values.nation}
                         onChange={handleChange}
                         required
-                      />
+                      >
+                        {nationsList.map((item, index) => (
+                          <option
+                            key={index}
+                            value={item._id}
+                          >
+                            {item.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
 
                     <div className="col-md-3">
@@ -182,6 +199,7 @@ function AddPlayer() {
                         name="goals"
                         min="0"
                         max="1000"
+                        placeholder="e.g 800"
                         value={values.goals}
                         onChange={handleChange}
                         required
@@ -194,11 +212,30 @@ function AddPlayer() {
                   <button
                     className="w-100 btn btn-success btn-lg"
                     type="submit"
-                    onClick={() => handleAdd(state.accessToken)}
+                    id="liveToastBtn"
                   >
                     Add Player
                   </button>
                 </form>
+                <div
+                  className="toast hide align-items-center"
+                  role="alert"
+                  aria-live="assertive"
+                  aria-atomic="true"
+                  id="liveToast"
+                >
+                  <div className="d-flex">
+                    <div className="toast-body">
+                      Hello, world! This is a toast message.
+                    </div>
+                    <button
+                      type="button"
+                      className="btn-close me-2 m-auto"
+                      data-bs-dismiss="toast"
+                      aria-label="Close"
+                    ></button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

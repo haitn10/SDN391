@@ -119,9 +119,17 @@ function Home() {
                 <Link to="/login">
                   <button
                     type="button"
-                    className="btn border text-uppercase text-white"
+                    className="btn border text-uppercase text-white mx-2"
                   >
                     Sign In
+                  </button>
+                </Link>
+                <Link to="/register">
+                  <button
+                    type="button"
+                    className="btn border text-uppercase text-white"
+                  >
+                    Sign Up
                   </button>
                 </Link>
               </div>

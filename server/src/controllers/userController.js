@@ -8,8 +8,8 @@ const register = async (req, res, next) => {
     });
     if (checkUser) {
       return res.status(400).json({
-        errorStatus: 400,
-        errorMessage: "Username has ready existed!",
+        status: 400,
+        message: "Username has ready existed!",
       });
     } else {
       const password = hashPassword(req.body.password);
@@ -41,13 +41,13 @@ const getAllUsers = async (req, res, next) => {
 };
 
 const getUser = async (req, res, next) => {
-  const userId = req.body._id;
+  const userId = req.params.Id;
   try {
     const userInfo = await User.findOne({ _id: userId });
     if (!userInfo)
       return res
         .status(404)
-        .json({ errorStatus: 404, errorMessage: "Not Found User!" });
+        .json({ status: 404, message: "Not Found User!" });
     const data = {
       _id: userInfo._id,
       username: userInfo.username,
@@ -62,14 +62,14 @@ const getUser = async (req, res, next) => {
 };
 
 const editInfo = async (req, res, next) => {
-  const userId = req.body._id;
+  const userId = req.params.Id;
   try {
     const userInfo = await User.findByIdAndUpdate(userId, req.body);
     if (!userInfo)
       return res
         .status(400)
-        .json({ errorStatus: 400, errorMessage: "Cannot update User!" });
-    res.status(200).json(req.body);
+        .json({ status: 400, message: "Cannot update User!" });
+    res.status(200).json({ status: 200, message: "Update Successfully!" });
   } catch (e) {
     res.status(500).json({ status: 500, message: "Internal Server Error!" });
     next(e);
@@ -77,14 +77,14 @@ const editInfo = async (req, res, next) => {
 };
 
 const removeUsers = async (req, res, next) => {
-  const userId = req.body._id;
+  const userId = req.params.Id;
   try {
-    const userInfo = await User.findOneAndRemove({ _id: userId });
+    const userInfo = await User.findByIdAndRemove({ _id: userId });
     if (!userInfo)
       return res
         .status(400)
-        .json({ errorStatus: 400, errorMessage: "Delete User failed!" });
-    res.status(200).json(req.body);
+        .json({ status: 400, message: "Delete User failed!" });
+    res.status(200).json({ status: 200, message: "Delete Successfully!" });
   } catch (e) {
     res.status(500).json({ status: 500, message: "Internal Server Error!" });
     next(e);
@@ -93,34 +93,38 @@ const removeUsers = async (req, res, next) => {
 
 const upRole = async (req, res, next) => {
   const userId = req.params.Id;
+  console.log(userId)
   try {
-    const userInfo = await User.findByIdAndUpdate(userId, { isAdmin: true });
+    const userInfo = await User.findByIdAndUpdate(
+      { _id: userId },
+      { isAdmin: true }
+    );
     if (!userInfo)
       return res
         .status(400)
-        .json({ errorStatus: 400, errorMessage: "Cannot update role Admin!" });
+        .json({ status: 400, message: "Cannot update role Admin!" });
     res.status(200).json({ state: 200, message: "Update successfully!" });
   } catch (e) {
     res
       .status(500)
-      .json({ errorStatus: 500, errorMessage: "Internal Server Error! " });
+      .json({ status: 500, message: "Internal Server Error! " });
     next(e);
   }
 };
 
 const downRole = async (req, res, next) => {
-  const userId = req.body._id;
+  const userId = req.params.Id;
   try {
     const userInfo = await User.findByIdAndUpdate(userId, { isAdmin: false });
     if (!userInfo)
       return res
         .status(400)
-        .json({ errorStatus: 400, errorMessage: "Cannot update User!" });
+        .json({ status: 400, message: "Cannot update User!" });
     res.status(200).json({ state: 200, message: "Update successfully!" });
   } catch (e) {
     res
       .status(500)
-      .json({ errorStatus: 500, errorMessage: "Internal Server Error! " });
+      .json({ status: 500, message: "Internal Server Error! " });
     next(e);
   }
 };

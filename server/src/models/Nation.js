@@ -6,10 +6,6 @@ const NationSchema = new mongoose.Schema(
     name: {
       type: String,
       require: true,
-    },
-    descs: {
-      type: String,
-      require: true,
     }
   }  
 );

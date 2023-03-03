@@ -1,55 +1,157 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Navbar from "../common/Navbar";
 import { StoreContext } from "../../store";
-import { useNavigate } from "react-router-dom";
+import { addNation, deleteNation, getNations } from "../../api";
 
 function Nations() {
   const [state, dispatch] = useContext(StoreContext);
-  const navigate = useNavigate();
+  const [nations, setNations] = useState([]);
+  const [newNation, setNewNation] = useState("");
+  const [refresh, setRefresh] = useState(false);
+
+  useEffect(() => {
+    async function fetchMyAPI() {
+      const response = await getNations();
+      setNations(response);
+    }
+    fetchMyAPI();
+  }, [refresh]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setRefresh(true);
+    const response = await addNation({
+      name: newNation,
+      token: state.accessToken,
+    });
+    if (response.status === 200) {
+      setNewNation("");
+      setRefresh(false);
+    } else {
+      setNewNation("");
+      setRefresh(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    setRefresh(true);
+    const confirm = window.confirm("Are you sure you want to delete ?");
+    if (confirm) {
+      const response = await deleteNation({
+        id: id,
+        token: state.accessToken,
+      });
+      if (response.status === 200) {
+        setNewNation("");
+        setRefresh(false);
+      } else {
+        setNewNation("");
+        setRefresh(false);
+      }
+    }
+    return;
+  };
   return (
     <>
       <Navbar active="text-muted" styleNav="frontWeight:600px" />
-      <div className="container">
-        <div className="row card justify-content-md-center mt-5">
+      {state.profile.isAdmin ? (
+        <>
           <div
-            className="row col-sm-12"
-            data-bs-toggle="collapse"
-            href="#collapseExample"
-            role="button"
-            aria-expanded="false"
-            aria-controls="collapseExample"
+            className="position-relative mt-3 container"
+            style={{ zIndex: 1 }}
           >
-            <div className=" col-sm-3">
-              <img
-                src="https://cloudinary.fifa.com/api/v3/picture/flags-sq-4/Vie"
-                className="img-fluid w-25"
-                alt="..."
-              />
-            </div>
-            <div className=" col-sm-8">Hello</div>
-            <div className=" col-sm-auto">Hello</div>
-            {/* <div className="card">
-              <img
-                src="https://cloudinary.fifa.com/api/v3/picture/flags-sq-4/Vie"
-                className="img-fluid"
-                alt="..."
-              />
-              <div className="card-body">
-                <h5 className="card-title">Viet Nam</h5>
-                <p className="card-text">
-                  Some quick example text to build on the card title and make up
-                  the bulk of the card's content.
-                </p>
+            <button
+              className="btn btn-outline-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#addNation"
+            >
+              <i className="bi bi-plus-lg"></i>
+              <span>New Nation</span>
+            </button>
+          </div>
+          <div
+            className="modal fade"
+            id="addNation"
+            data-bs-backdrop="static"
+            data-bs-keyboard="false"
+            tabIndex="-1"
+            aria-labelledby="staticBackdropLabel"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <button
+                    type="button"
+                    className="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div className="modal-body">
+                  <form onSubmit={handleSubmit}>
+                    <div className="mb-3">
+                      <label htmlFor="nameNation" className="col-form-label">
+                        Name Nation:
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="nameNation"
+                        required
+                        value={newNation}
+                        onChange={(e) => setNewNation(e.target.value)}
+                      />
+                    </div>
+                    <div className="d-flex justify-content-center">
+                      <button
+                        type="submit"
+                        className="btn btn-success"
+                        data-bs-dismiss={newNation ? "modal" : ""}
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </div>
-            </div> */}
-          </div>
-          <div class="collapse" id="collapseExample">
-            <div class="card card-body">
-              Some placeholder content for the collapse component. This panel is
-              hidden by default but revealed when the user activates the
-              relevant trigger.
             </div>
           </div>
+        </>
+      ) : null}
+      <div className="container">
+        <div className="row mt-5">
+          {nations.status !== 201 ? (
+            nations.map((item, index) => (
+              <div key={index} className="col-3 mt-3">
+                <div className="card">
+                  <img
+                    src={`https://cloudinary.fifa.com/api/v3/picture/flags-sq-4/${item.name.slice(
+                      0,
+                      3
+                    )}`}
+                    className="img-thumbnail "
+                    alt=""
+                  />
+                  <div className="card-body d-flex justify-content-between">
+                    <h5 className="card-title">{item.name}</h5>
+                    {state.profile.isAdmin ? (
+                      <button
+                        className="border-0 bg-transparent"
+                        onClick={(e) => handleDelete(item._id)}
+                      >
+                        <i className="bi bi-trash3 text-danger mx-2"></i>
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="col-sm-12 d-flex justify-content-center">
+              <span>{nations.message}</span>
+            </div>
+          )}
         </div>
       </div>
     </>

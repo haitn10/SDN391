@@ -1,13 +1,15 @@
 import React, { useContext, useEffect, useState } from "react";
-import Navbar from "../../common/Navbar";
+import Navbar from "../common/Navbar";
 import { positions } from "./AddPlayer";
-import { StoreContext } from "../../../store";
-import { editPlayer, getPlayerByID } from "../../../api";
+import { StoreContext } from "../../store";
+import { editPlayer, getNations, getPlayerByID } from "../../api";
 import { useNavigate } from "react-router-dom";
+import { message } from "antd";
 
 function Details({ id, disabled }) {
   const navigate = useNavigate();
   const [state, dispatch] = useContext(StoreContext);
+  const [messageApi, contextHolder] = message.useMessage();
   const [values, setValues] = useState({
     name: "",
     image: "",
@@ -18,11 +20,14 @@ function Details({ id, disabled }) {
     jerseyNumber: "",
     goals: "",
   });
+  const [nationsList, setNationsList] = useState([]);
 
   useEffect(() => {
     async function fetchMyAPI(id) {
       const response = await getPlayerByID(id);
+      const list = await getNations();
       setValues(response);
+      setNationsList(list);
     }
     fetchMyAPI(id);
   }, [id]);
@@ -35,14 +40,25 @@ function Details({ id, disabled }) {
   };
 
   const handleSubmit = async (token, id) => {
-    await dispatch(editPlayer({ values, id, token }));
-    return navigate(`/players/${id}`);
+    const result = await dispatch(editPlayer({ values, id, token }));
+    if (result.status === 200) {
+      info("success", result.message);
+    } else {
+      info("error", result.message);
+    }
+  };
+
+  const info = (status, msg) => {
+    messageApi.open({
+      type: status,
+      content: msg,
+    });
   };
 
   return (
     <>
+      {contextHolder}
       <Navbar />
-
       <div className="container rounded bg-white mt-5 mb-5">
         <form
           className="row"
@@ -51,7 +67,16 @@ function Details({ id, disabled }) {
           <div className="col-md-1"></div>
           <div className="col-md-4">
             <div className="d-flex flex-column align-items-center text-center p-3 py-5">
-              <label htmlFor="upload-photo">
+              {values.image ? (
+                <img src={values.image} className="img card-img" alt="" />
+              ) : (
+                <img
+                  src="https://ae01.alicdn.com/kf/UT8PyDTXsFXXXagOFbXy/12-15CM-Football-Players-Reflective-Car-Decorative-Stickers-Decals-Classic-Car-Body-Cover-Scratches-Accessories-C4.jpg_Q90.jpg_.webp"
+                  className="img card-img"
+                  alt=""
+                />
+              )}
+              {/* <label htmlFor="upload-photo">
                 <input
                   style={{ display: "none" }}
                   id="upload-photo"
@@ -73,8 +98,7 @@ function Details({ id, disabled }) {
               </label>
 
               <span className="font-weight-bold">{values.name}</span>
-              <span className="text-black-50">{values.club}</span>
-              <span> </span>
+              <span className="text-black-50">{values.club}</span> */}
             </div>
           </div>
           <div className="col-md-5 border my-3">
@@ -93,6 +117,38 @@ function Details({ id, disabled }) {
                     name="name"
                     onChange={handleChange}
                     value={values.name}
+                    disabled={disabled}
+                  />
+                </div>
+                <div className="col-md-12 my-1">
+                  <label className="labels">Nation</label>
+                  <select
+                    className="form-select"
+                    name="nation"
+                    onChange={handleChange}
+                    required
+                    disabled={disabled}
+                  >
+                    {nationsList.map((item, index) => (
+                      <option
+                        key={index}
+                        value={item._id}
+                        selected={item._id === values.nation ? true : false}
+                      >
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-md-12 my-1">
+                  <label className="labels">Name</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter URL image"
+                    name="image"
+                    onChange={handleChange}
+                    value={values.image}
                     disabled={disabled}
                   />
                 </div>

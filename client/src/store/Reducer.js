@@ -1,14 +1,14 @@
-import { LOG_OUT, SET_DATA, SET_PLAYER, SET_USER } from "./Constants";
+import { LOG_OUT, SET_DATA, SET_NATION, SET_PLAYER } from "./Constants";
 
 const data = JSON.parse(sessionStorage.getItem("data"));
 const players = JSON.parse(sessionStorage.getItem("players"));
-const users = JSON.parse(sessionStorage.getItem("users"));
+const nations = JSON.parse(sessionStorage.getItem("nations"));
 
 export const initialState = {
   profile: data ? data.profile : {},
   accessToken: data ? data.accessToken : null,
-  player: players ? players : [],
-  users: users ? users : [],
+  players: players ? players : [],
+  nations: nations ? nations : [],
 };
 
 export const reducer = (state, action) => {
@@ -21,22 +21,22 @@ export const reducer = (state, action) => {
     case SET_PLAYER:
       return {
         ...state,
-        player: [...action.state],
+        players: [...action.state],
       };
-    case SET_USER:
+    case SET_NATION:
       return {
         ...state,
-        users: [...action.state],
+        nations: [...action.state],
       };
 
     case LOG_OUT:
-      sessionStorage.removeItem("data");
-      sessionStorage.removeItem("players");
+      sessionStorage.clear();
       return {
         ...state,
         profile: {},
         accessToken: null,
         player: [],
+        nations: [],
       };
     default:
       return state;

@@ -32,9 +32,8 @@ const PlayerSchema = mongoose.Schema(
       require: true,
     },
     nation: {
-      // type: mongoose.Schema.Types.ObjectId,
-      type:String,
-      // ref: "nation",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Nation",
       require: true,
     }
   }

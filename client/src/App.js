@@ -5,11 +5,12 @@ import Accounts from "./components/pages/Accounts";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Nations from "./components/nations";
 import Players from "./components/players";
-import DetailsPlayers from "./components/players/actions/Details";
+import DetailsPlayers from "./components/players/Details";
 import { createBrowserHistory } from "history";
 import { StoreContext } from "./store";
-import AddPlayer from "./components/players/actions/AddPlayer";
+import AddPlayer from "./components/players/AddPlayer";
 import Users from "./components/users";
+import Register from "./components/pages/Register";
 
 const history = createBrowserHistory();
 
@@ -23,6 +24,7 @@ function App() {
           <Routes>
             <Route path="/*" element={<Navigate to="/home" />} exact />
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/home" element={<Home />} />
           </Routes>
         </BrowserRouter>
@@ -43,7 +45,7 @@ function App() {
             <Route path="/users" element={<Users />} />
             <Route path="/players/add" element={<AddPlayer />} exact/>
             <Route path="/accounts" element={<Accounts />} />
-            {state.player.map((item, index) => (
+            {state.players.map((item, index) => (
               <Route
                 key={index}
                 path={`/players/${item._id}`}
@@ -66,8 +68,8 @@ function App() {
             <Route path="/home" element={<Home />} />
             <Route path="/nations" element={<Nations />} />
             <Route path="/players" element={<Players />} />
-            <Route path="/accounts" element={<Accounts />} />
-            {state.player.map((item, index) => (
+            <Route path="/accounts" element={<Accounts id={state.profile.id} />} />
+            {state.players.map((item, index) => (
               <Route
                 key={index}
                 path={`/players/${item._id}`}

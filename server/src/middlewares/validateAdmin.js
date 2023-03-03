@@ -20,7 +20,7 @@ const validateAdmin = async (req, res, next) => {
     }
     return next();
   } catch (e) {
-    return res.status(500).json("Internal Server Error!");
+    return res.status(500).json({ status: 500, message: "Internal Server Error!" });
   }
 };
 
